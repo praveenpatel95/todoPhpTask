@@ -1,0 +1,19 @@
+{
+    "name": "user/todo-app",
+    "description": "A simple Todo List application",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Core\\": "app/core/",
+            "Controllers\\": "app/controllers/",
+            "Models\\": "app/models/",
+            "Helpers\\": "app/helpers/",
+            "Services\\": "app/services/",
+            "Exceptions\\": "app/exceptions/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
