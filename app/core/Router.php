@@ -5,13 +5,15 @@ namespace Core;
 class Router
 {
     private array $routes = [];
+    private array $middleware = [];
 
-    public function register(string $method, string $path, callable|array $handler): void
+    public function register(string $method, string $path, callable|array $handler, array $middleware = []): void
     {
         $this->routes[] = [
             'method' => strtoupper($method),
             'path' => $this->convertToRegex($path),
-            'handler' => $handler
+            'handler' => $handler,
+            'middleware' => $middleware
         ];
     }
 
@@ -23,6 +25,14 @@ class Router
         foreach ($this->routes as $route) {
             if ($route['method'] === $requestMethod && preg_match($route['path'], $requestUri, $matches)) {
                 array_shift($matches); // Remove the full match from regex results
+
+                // Run middleware first
+                foreach ($route['middleware'] as $middlewareClass) {
+                    $middleware = new $middlewareClass();
+                    if (!$middleware->handle()) {
+                        return; // Stop if middleware fails
+                    }
+                }
 
                 $handler = $route['handler'];
                 if (is_callable($handler)) {

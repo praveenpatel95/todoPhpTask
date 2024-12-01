@@ -14,11 +14,13 @@ class Task
     }
 
     /**
+     * @param int $userId
      * @return array
      */
-    public function getAll(): array
+    public function getAllByUserId(int $userId): array
     {
-        $stmt = $this->db->query("SELECT * FROM tasks ORDER BY created_at DESC");
+        $stmt = $this->db->prepare("SELECT * FROM tasks WHERE user_id = :user_id ORDER BY created_at DESC");
+        $stmt->execute(['user_id' => $userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -28,8 +30,8 @@ class Task
      */
     public function create(array $data): bool
     {
-        $stmt = $this->db->prepare("INSERT INTO tasks (title, description) VALUES (:title, :description)");
-        return $stmt->execute(['title' => $data['title'], 'description' => $data['description']]);
+        $stmt = $this->db->prepare("INSERT INTO tasks (title, description, user_id) VALUES (:title, :description, :user_id)");
+        return $stmt->execute(['title' => $data['title'], 'description' => $data['description'], 'user_id' => $data['user_id']]);
     }
 
     /**

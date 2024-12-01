@@ -19,6 +19,7 @@ class TaskGetAllService
      */
     public function process(): ?array
     {
-        return $this->taskModel->getAll();
+        $userId = $_REQUEST['user_id'];
+        return $this->taskModel->getAllByUserId($userId);
     }
 }

@@ -1,20 +1,20 @@
 <?php
 
-namespace Services\Task;
+namespace Services\Auth;
 
-use Models\Task;
+use Models\User;
 use Helpers\Validator;
 use Exceptions\ValidationException;
 
 /**
  * Service class for creating new tasks
  */
-class TaskCreateService
+class UserRegisterService
 {
     /**
-     * @var Task Task model instance
+     * @var User Task model instance
      */
-    protected Task $taskModel;
+    protected User $taskModel;
 
     /**
      * @var Validator Validator instance
@@ -31,19 +31,12 @@ class TaskCreateService
      */
     public function __construct()
     {
-        $this->taskModel = new Task();
+        $this->userModel = new User();
         $this->validator = new Validator();
     }
 
     /**
      * Set the data to be processed
-     *
-     * @param array|null $data The task data to be validated and created
-     *                         Expected format:
-     *                         [
-     *                             'title' => string,
-     *                             'description' => string
-     *                         ]
      * @return self Returns the current instance for method chaining
      */
     public function setData(?array $data): self
@@ -53,7 +46,7 @@ class TaskCreateService
     }
 
     /**
-     * Process task creation with validation
+     * Process User creation with validation
      *
      * @throws ValidationException When validation fails, contains validation errors
      * @return bool|null Returns true on successful creation, null on failure
@@ -61,16 +54,19 @@ class TaskCreateService
     public function process(): ?bool
     {
         $rules = [
-            'title' => 'required|min:3|max:255',
-            'description' => 'required|min:10|max:1000',
+            'name' => 'required|min:3|max:255',
+            'email' => 'required|min:10|max:255',
+            'password' => 'required|min:3|max:255',
         ];
 
         // Validate data
         if (!$this->validator->validate($this->data, $rules)) {
             throw new ValidationException($this->validator->getErrors());
         }
-        $userId = $_REQUEST['user_id'];
-        $this->data['user_id'] = $userId;
-        return $this->taskModel->create($this->data);
+
+        // Hash password
+        $this->data['password'] = password_hash($this->data['password'], PASSWORD_DEFAULT);
+
+        return $this->userModel->create($this->data);
     }
 }
